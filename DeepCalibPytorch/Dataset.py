@@ -8,35 +8,43 @@ import random
 class ImageDataset(Dataset):
     def __init__(
         self, 
-        image_dir, 
+        image_dir,
+        max_len,
         classes_focal, 
         classes_distortion
     ):
         super().__init__()
         self.classes_focal = classes_focal
         self.classes_distortion = classes_distortion
-        self.filenames, self.focal_labels, self.distortion_labels = self.get_paths(image_dir)
-        self.focal_labels = torch.tensor(self.focal_labels)
-        self.distortion_labels = torch.tensor(self.distortion_labels)
+        filenames, focal_labels, distortion_labels = self.get_paths(image_dir, max_len)
+        self.images = self.load_image(filenames)
+
+        self.focal_labels = torch.tensor(focal_labels)
+        self.distortion_labels = torch.tensor(distortion_labels)
+
         self.preprocess = v2.Compose([
-            v2.Resize((299, 299)),
             v2.RandomHorizontalFlip(p = 0.5),
             v2.ToImage(),
             v2.ToDtype(torch.float32, scale=True),
-            v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            CustomTransform()
+            CustomTransform(),
+            v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
     def __len__(self):
         return len(self.focal_labels)
 
     def __getitem__(self, idx):
-        image = Image.open(self.filenames[idx])
-        return self.preprocess(image), self.focal_labels[idx], self.distortion_labels[idx]
+        return self.preprocess(self.images[idx]), self.focal_labels[idx], self.distortion_labels[idx]
     
-    def get_paths(self, IMAGE_FILE_PATH_DISTORTED):
+    def load_image(self, filenames):
+        images = []
+        for filename in filenames:
+            image = Image.open(filename)
+            images.append(image)
+        return images
+
+    def get_paths(self, IMAGE_FILE_PATH_DISTORTED, max_len):
         paths_train = glob.glob(IMAGE_FILE_PATH_DISTORTED + "*.jpg")
-        paths_train.sort()
         parameters = []
         labels_focal_train = []
         for path in paths_train:
@@ -51,12 +59,11 @@ class ImageDataset(Dataset):
             curr_class = self.classes_distortion.index(curr_parameter)
             labels_distortion_train.append(curr_class)
 
-        c = list(zip(paths_train, labels_focal_train,labels_distortion_train))
+        c = list(zip(paths_train, labels_focal_train, labels_distortion_train))
         random.shuffle(c)
         paths_train, labels_focal_train,labels_distortion_train = zip(*c)
         paths_train, labels_focal_train, labels_distortion_train = list(paths_train), list(labels_focal_train), list(labels_distortion_train)
-        return paths_train, labels_focal_train, labels_distortion_train
-
+        return paths_train[:max_len], labels_focal_train[:max_len], labels_distortion_train[:max_len]
 
 class CustomTransform:
     def __init__(

@@ -1,19 +1,18 @@
 import torch.nn as nn
-from torchvision.models import inception_v3, Inception_V3_Weights
+from FeatureExtractor import FeatureExtractor
 
 class Model(nn.Module):
     def __init__(
         self,
+        extractor_name,
         n_focal,
-        n_distortion
+        n_distortion,
+        device
     ):
         super().__init__()
-        self.model = inception_v3(weights=Inception_V3_Weights.DEFAULT)
-        self.model.fc = nn.Identity()
-        self.model.eval()
-        in_features = 2048
-        self.focal_layer = nn.Linear(in_features, n_focal)
-        self.distortion_layer = nn.Linear(in_features, n_distortion)
+        self.model = FeatureExtractor(extractor_name, device)
+        self.focal_layer = nn.Linear(self.model.get_feature_size(), n_focal).to(device)
+        self.distortion_layer = nn.Linear(self.model.get_feature_size(), n_distortion).to(device)
 
     def forward(self, x):
         image_feature = self.model(x)
