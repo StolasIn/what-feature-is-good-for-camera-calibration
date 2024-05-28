@@ -6,19 +6,33 @@ from tqdm import tqdm
 from Dataset import ImageDataset
 from Model import Model
 import matplotlib.pyplot as plt
+import random
+import os
 import warnings
 warnings.filterwarnings("ignore")
 
+
+def set_seed(seed: int = 42) -> None:
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    print(f"Random seed set as {seed}")
+
 if __name__ == '__main__':
-    classes_focal = list(np.arange(50, 500 + 1, 50))
+    set_seed(2024)
+    classes_focal = list(np.arange(50, 500 + 1, 10))
     classes_distortion = list(np.arange(0, 90 + 1, 4) / 100.)
     device = 'cuda:0'
     extractor_name = "Inception"
 
-    n_epochs = 100
+    n_epochs = 200
     model = Model(extractor_name, len(classes_focal), len(classes_distortion), device)
-    dataset = ImageDataset("train/", 50000, classes_focal, classes_distortion)
-    train_data = DataLoader(dataset, batch_size=64, shuffle=True)
+    dataset = ImageDataset("../dataset/train500k/", 50000, classes_focal, classes_distortion)
+    train_data = DataLoader(dataset, batch_size=32, shuffle=True)
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
     criterion = nn.CrossEntropyLoss()
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma = 0.95)
