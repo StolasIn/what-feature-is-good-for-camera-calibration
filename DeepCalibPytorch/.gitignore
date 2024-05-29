@@ -2,3 +2,4 @@
 *.jpg
 *.pth
 dataset/
+__pycache__/
