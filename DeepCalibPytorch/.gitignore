@@ -1,5 +1,7 @@
 *.png
 *.jpg
 *.pth
+*.zip
+checkpoints/
 dataset/
 __pycache__/

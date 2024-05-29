@@ -11,9 +11,11 @@ class ImageDataset(Dataset):
         image_dir,
         max_len,
         classes_focal, 
-        classes_distortion
+        classes_distortion,
+        data_augmentation = True
     ):
         super().__init__()
+        self.data_augmentation = data_augmentation
         self.classes_focal = classes_focal
         self.classes_distortion = classes_distortion
         filenames, focal_labels, distortion_labels = self.get_paths(image_dir, max_len)
@@ -22,7 +24,13 @@ class ImageDataset(Dataset):
         self.focal_labels = torch.tensor(focal_labels)
         self.distortion_labels = torch.tensor(distortion_labels)
 
-        self.preprocess = v2.Compose([
+        self.transform_none = v2.Compose([
+            v2.ToImage(),
+            v2.ToDtype(torch.float32, scale=True),
+            v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+
+        self.transform_augmentation = v2.Compose([
             v2.RandomHorizontalFlip(p = 0.5),
             v2.ToImage(),
             v2.ToDtype(torch.float32, scale=True),
@@ -34,7 +42,11 @@ class ImageDataset(Dataset):
         return len(self.focal_labels)
 
     def __getitem__(self, idx):
-        return self.preprocess(self.images[idx]), self.focal_labels[idx], self.distortion_labels[idx]
+        if self.data_augmentation == True:
+            tensor = self.transform_augmentation(self.images[idx])
+        else:
+            tensor = self.transform_none(self.images[idx])
+        return tensor, self.focal_labels[idx], self.distortion_labels[idx]
     
     def load_image(self, filenames):
         images = []

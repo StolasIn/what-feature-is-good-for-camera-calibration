@@ -1,3 +1,0 @@
-/home/binghong/ComputerVision/FinalProject/DeepCalib/dataset/distorted/pano_056327084ab7d7c4a25500f131bf442f_f_130_d_0.84.jpg 140 0.94
-/home/binghong/ComputerVision/FinalProject/DeepCalib/dataset/distorted/pano_a8d3f505a1e70e1691428e024a69a79a_f_120_d_1.0.jpg 120 1.12
-/home/binghong/ComputerVision/FinalProject/DeepCalib/dataset/distorted/pano_azkwcozqxtppap_f_90_d_0.68.jpg 80 0.6
