@@ -31,7 +31,9 @@ if __name__ == '__main__':
 
     n_epochs = 200
     model = Model(extractor_name, len(classes_focal), len(classes_distortion), device)
-    dataset = ImageDataset("../dataset/train500k/", 50000, classes_focal, classes_distortion)
+    # print(sum(p.numel() for p in model.parameters() if p.requires_grad))
+    # print(sum(p.numel() for p in model.parameters() if not p.requires_grad))
+    dataset = ImageDataset("../dataset/train500k/", 50, classes_focal, classes_distortion)
     train_data = DataLoader(dataset, batch_size=32, shuffle=True)
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
     criterion = nn.CrossEntropyLoss()

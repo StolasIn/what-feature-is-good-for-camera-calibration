@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision.models import inception_v3, Inception_V3_Weights
+from torchvision.models import inception_v3, Inception_V3_Weights, InceptionOutputs
 
 class Inception(nn.Module):
     def __init__(
@@ -13,4 +13,9 @@ class Inception(nn.Module):
         self.feature_size = 2048
     
     def forward(self, x):
-        return self.model(x).logits
+        features = self.model(x)
+        # print(type(features), type(InceptionOutputs), InceptionOutputs)
+        if isinstance(features, InceptionOutputs):
+            return features.logits
+        else:
+            return features

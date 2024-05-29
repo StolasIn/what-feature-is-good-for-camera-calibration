@@ -10,15 +10,14 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-    classes_focal = list(np.arange(50, 500 + 1, 50))
+    classes_focal = list(np.arange(50, 500 + 1, 10))
     classes_distortion = list(np.arange(0, 90 + 1, 4) / 100.)
-    device = 'cuda:0'
-    model_path = "model_final.pth"
+    device = 'cuda:1'
+    model_path = "model_80.pth"
     
-    dataset = ImageDataset("train/", 25000, classes_focal, classes_distortion)
-    model = torch.load(model_path)
+    dataset = ImageDataset("../dataset/train500k/", 50000, classes_focal, classes_distortion)
+    model = torch.load(model_path).to(device)
     test_data = DataLoader(dataset, batch_size=64, shuffle=True)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     focal_acc = 0
     distortion_acc = 0

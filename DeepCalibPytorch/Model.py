@@ -11,8 +11,8 @@ class Model(nn.Module):
     ):
         super().__init__()
         self.model = FeatureExtractor(extractor_name, device)
-        self.focal_layer = nn.Linear(self.model.get_feature_size(), n_focal).to(device)
-        self.distortion_layer = nn.Linear(self.model.get_feature_size(), n_distortion).to(device)
+        self.focal_layer = nn.Linear(2048, n_focal).to(device)
+        self.distortion_layer = nn.Linear(2048, n_distortion).to(device)
 
     def forward(self, x):
         image_feature = self.model(x)
