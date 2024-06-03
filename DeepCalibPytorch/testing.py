@@ -13,9 +13,9 @@ if __name__ == '__main__':
     classes_focal = list(np.arange(50, 500 + 1, 10))
     classes_distortion = list(np.arange(0, 90 + 1, 4) / 100.)
     device = 'cuda:1'
-    model_path = "model_80.pth"
+    model_path = "checkpoints/ResNet/model_best.pth"
     
-    dataset = ImageDataset("../dataset/train500k/", 50000, classes_focal, classes_distortion)
+    dataset = ImageDataset("../dataset/test66k/", -1, classes_focal, classes_distortion)
     model = torch.load(model_path).to(device)
     test_data = DataLoader(dataset, batch_size=64, shuffle=True)
 

@@ -25,12 +25,14 @@ class ImageDataset(Dataset):
         self.distortion_labels = torch.tensor(distortion_labels)
 
         self.transform_none = v2.Compose([
+            v2.Resize(224),
             v2.ToImage(),
             v2.ToDtype(torch.float32, scale=True),
             v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
 
         self.transform_augmentation = v2.Compose([
+            v2.Resize(224),
             v2.RandomHorizontalFlip(p = 0.5),
             v2.ToImage(),
             v2.ToDtype(torch.float32, scale=True),
@@ -75,6 +77,10 @@ class ImageDataset(Dataset):
         random.shuffle(c)
         paths_train, labels_focal_train,labels_distortion_train = zip(*c)
         paths_train, labels_focal_train, labels_distortion_train = list(paths_train), list(labels_focal_train), list(labels_distortion_train)
+        
+        if max_len == -1:
+            return paths_train, labels_focal_train, labels_distortion_train
+        
         return paths_train[:max_len], labels_focal_train[:max_len], labels_distortion_train[:max_len]
 
 class CustomTransform:

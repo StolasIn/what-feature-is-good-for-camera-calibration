@@ -22,16 +22,18 @@ if __name__ == '__main__':
     classes_focal = list(np.arange(50, 500 + 1, 10))
     classes_distortion = list(np.arange(0, 90 + 1, 4) / 100.)
     device = 'cuda:1'
-    model_path = "model_50.pth"
+    model_path = "checkpoints/ViT_32/model_best.pth"
     folder_path = "distortion_images"
     names, images = read_images(folder_path)
     model = torch.load(model_path).eval().to(device)
 
     preprocess = v2.Compose([
+        v2.Resize(224),
         v2.ToImage(),
         v2.ToDtype(torch.float32, scale=True),
         v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
+    print(preprocess)
 
     with torch.no_grad():
         for i in range(len(images)):
@@ -51,4 +53,6 @@ if __name__ == '__main__':
             Paramsund = {'f': f_dist, 'W': width, 'H': height}
 
             Image_und = undistSphIm(images[i], Paramsd, Paramsund)
-            cv2.imwrite(f"undistortion_images/{names[i]}_undistorted.png", Image_und)
+            Image = cv2.resize(images[i], (Image_und.shape[:2]))
+            result = np.concatenate((Image, Image_und), axis=1)
+            cv2.imwrite(f"undistortion_images/{names[i]}_undistorted.png", result)

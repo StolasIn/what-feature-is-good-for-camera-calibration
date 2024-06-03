@@ -31,16 +31,16 @@ if __name__ == '__main__':
     classes_focal = list(np.arange(50, 500 + 1, 10))
     classes_distortion = list(np.arange(0, 90 + 1, 4) / 100.)
     device = "cuda:0"
-    folder = "checkpoints/baseline/"
+    folder = "checkpoints/ResNet_freeze/"
     new_folder(folder)
-    extractor_name = "Inception"
+    extractor_name = "ResNet"
 
     n_epochs = 100
     model = Model(extractor_name, len(classes_focal), len(classes_distortion), device)
-    # print(sum(p.numel() for p in model.parameters() if p.requires_grad))
-    # print(sum(p.numel() for p in model.parameters() if not p.requires_grad))
+    print(sum(p.numel() for p in model.parameters() if p.requires_grad))
+    print(sum(p.numel() for p in model.parameters() if not p.requires_grad))
     train_dataset = ImageDataset("../dataset/train500k/", 50000, classes_focal, classes_distortion, data_augmentation=True)
-    val_dataset = ImageDataset("../dataset/valid10k/", 10000, classes_focal, classes_distortion, data_augmentation=True)
+    val_dataset = ImageDataset("../dataset/valid10k/", 10000, classes_focal, classes_distortion, data_augmentation=False)
 
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     val_loader = DataLoader(train_dataset, batch_size=32, shuffle=False)
