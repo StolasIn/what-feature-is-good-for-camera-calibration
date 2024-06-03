@@ -14,11 +14,11 @@ if __name__ == '__main__':
     classes_distortion = list(np.arange(0, 90 + 1, 4) / 100.)
 
     device = 'cuda:0'
-    model_path = "checkpoints/ResNet/model_best.pth"
+    model_path = "checkpoints/baseline/model_50.pth"
     classes_focal_torch = torch.Tensor(classes_focal).to(device)
     classes_distortion_torch = torch.Tensor(classes_distortion).to(device)
     
-    dataset = ImageDataset("../dataset/test66k/", 25000, classes_focal, classes_distortion)
+    dataset = ImageDataset("../dataset/test66k/", -1, classes_focal, classes_distortion, data_augmentation=False)
     model = torch.load(model_path).to(device)
     test_data = DataLoader(dataset, batch_size = 512, shuffle=True)
 
